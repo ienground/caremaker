@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/usual_margin">
+
+    <ImageView
+        android:id="@+id/help_1"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/help_1_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_1_title"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/help_1" />
+
+    <TextView
+        android:id="@+id/help_1_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_1_content"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_1_title" />
+
+    <ImageView
+        android:id="@+id/help_2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_rounded_corner"
+        android:tint="@color/black"
+        android:layout_marginTop="@dimen/usual_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_1_content" />
+
+    <TextView
+        android:id="@+id/help_2_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_2_title"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/help_2" />
+
+    <TextView
+        android:id="@+id/help_2_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_2_content"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_2_title" />
+
+    <ImageView
+        android:id="@+id/help_3"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_image"
+        android:tint="@color/black"
+        android:layout_marginTop="@dimen/usual_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_2_content" />
+
+    <TextView
+        android:id="@+id/help_3_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_3_title"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/help_3" />
+
+    <TextView
+        android:id="@+id/help_3_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_3_content"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_3_title" />
+
+    <ImageView
+        android:id="@+id/help_4"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_share"
+        android:tint="@color/black"
+        android:layout_marginTop="@dimen/usual_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_3_content" />
+
+    <TextView
+        android:id="@+id/help_4_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_4_title"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/help_4" />
+
+    <TextView
+        android:id="@+id/help_4_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_4_content"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_4_title" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

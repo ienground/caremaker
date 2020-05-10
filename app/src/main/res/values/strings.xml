@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Care Maker</string>
+    <string name="file_not_chosen">File is not chosen</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="share">Share to..</string>
+    <string name="btn_share">Share</string>
+    <string name="allow_permission">Allow permission</string>
+    <string name="allow">Allow</string>
+    <string name="help">Help</string>
+    <string name="ok">OK</string>
+    <string name="import_image">Import Image</string>
+    <string name="banner_ad_unit_id">ca-app-pub-8050897224557020/5171320760</string>
+    <string name="help_1_title">Care Icon</string>
+    <string name="help_1_content">Click to the rotate image holding the Care icon 90 degrees clockwise.</string>
+    <string name="help_2_title">Image corner rounded</string>
+    <string name="help_2_content">Round the corners of the imported image. When clicked on a pink background, the corners are rounded, and when clicked on a black background, the corners are restored.</string>
+    <string name="help_3_title">Import Image</string>
+    <string name="help_3_content">Click to import image in your gallery.</string>
+    <string name="help_4_title">Share</string>
+    <string name="help_4_content">Share the created image to the outside. You can also save it on your phone.</string>
+    <string name="changelog">Changelog</string>
+    <string name="changelog_content">Initial Release</string>
+    <string name="ads_info">↑ Apps developer made</string>
+</resources>

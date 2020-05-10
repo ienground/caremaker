@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">힘내요콘 메이커</string>
+    <string name="file_not_chosen">파일이 선택되지 않았어요</string>
+    <string name="choose_image">앱을 선택하여 이미지를 불러오기</string>
+    <string name="share">공유하기..</string>
+    <string name="btn_share">공유</string>
+    <string name="allow_permission">권한을 허용해주세요</string>
+    <string name="allow">허용</string>
+    <string name="help">도움말</string>
+    <string name="ok">확인</string>
+    <string name="import_image">불러오기</string>
+    <string name="banner_ad_unit_id">ca-app-pub-8050897224557020/5171320760</string>
+    <string name="help_1_title">힘내요 아이콘</string>
+    <string name="help_1_content">클릭하면 힘내요 아이콘이 들고 있는 이미지가 시계 방향으로 90도 회전합니다.</string>
+    <string name="help_2_title">이미지 모서리 둥글게</string>
+    <string name="help_2_content">가져온 이미지의 모서리를 둥글게 합니다. 핑크 배경일 때 클릭 시 모서리가 둥글어지고, 검은 배경일 때 클릭 시 모서리가 원래대로 돌아옵니다.</string>
+    <string name="help_3_title">이미지 가져오기</string>
+    <string name="help_3_content">클릭하여 갤러리 속의 이미지를 가져옵니다.</string>
+    <string name="help_4_title">공유하기</string>
+    <string name="help_4_content">만든 이미지를 외부로 공유합니다. 휴대폰에 저장할 수도 있습니다.</string>
+    <string name="changelog">체인지로그</string>
+    <string name="changelog_content">최초 출시</string>
+    <string name="ads_info">↑ 개발자가 만든 앱!</string>
+</resources>

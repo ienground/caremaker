@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "719395420103",
+    "firebase_url": "https://ienlab-caremaker.firebaseio.com",
+    "project_id": "ienlab-caremaker",
+    "storage_bucket": "ienlab-caremaker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719395420103:android:80760dc48302a69a1e4be2",
+        "android_client_info": {
+          "package_name": "net.ienlab.caremaker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719395420103-s606pm1lctppjvqofgpt5tslhj2p85ct.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6DOUI4Xi0K77V-1FVlBbCT6udIJMI1mg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719395420103-s606pm1lctppjvqofgpt5tslhj2p85ct.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
