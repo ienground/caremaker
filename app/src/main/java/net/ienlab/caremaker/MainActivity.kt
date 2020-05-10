@@ -67,8 +67,6 @@ class MainActivity : AppCompatActivity() {
 
         adView.loadAd(adRequest.build())
 
-
-
         val thumbId = arrayOf(R.drawable.ads_bp, R.drawable.ads_ih)
         val thumbLink = arrayOf("net.ienlab.blogplanner", "net.ienlab.ireke")
 
@@ -167,75 +165,18 @@ class MainActivity : AppCompatActivity() {
         btn_share.setOnClickListener {
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
-                val bitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
-                val paint = Paint()
-                val canvas = Canvas(bitmap)
-                var bitmap_under =
-                    Bitmap.createScaledBitmap(
-                        BitmapFactory.decodeResource(resources, R.drawable.img_care_under),
-                        1000, 1000, true
-                    )
-
-                var bitmap_over =
-                    Bitmap.createScaledBitmap(
-                        BitmapFactory.decodeResource(resources, R.drawable.img_care_over),
-                        1000, 1000, true
-                    )
-
-                canvas.drawBitmap(bitmap_under, 0f, 0f, paint)
-//                if (!storage.purchasedAds())
-//                    canvas.drawBitmap(bitmap_watermark, 720f, 720f, paint)
-
-                var width = 559
-                var height = 559
-                if (originImage.width >= originImage.height) {
-                    height = 559 * originImage.height / originImage.width
-                } else {
-                    width = 559 * originImage.width / originImage.height
+                try {
+                    savedScale(1)
+                } catch (e: OutOfMemoryError) {
+                    e.printStackTrace()
+                    try {
+                        savedScale(2)
+                    } catch (e2: OutOfMemoryError) {
+                        e2.printStackTrace()
+                        savedScale(4)
+                    }
                 }
 
-                if (scaleTypeCode == SCALETYPE_NONE) {
-                    val copyImage = Bitmap.createScaledBitmap(originImage, width, height, false)
-                    canvas.drawBitmap(copyImage, (379 - width / 2).toFloat(), (721 - height / 2).toFloat(), paint)
-                } else if (scaleTypeCode == SCALETYPE_ROUND) {
-                    val copyImageCircle = originImageCircle
-                    copyImageCircle.setBounds(379 - width / 2, 721 - height / 2, 379 + width / 2, 721 + height / 2)
-                    copyImageCircle.draw(canvas)
-                }
-
-                canvas.drawBitmap(bitmap_over, 0f, 0f, paint)
-
-
-                val file = File(cacheDir, TEMP_FILE_NAME)
-
-                Log.d(TAG, "path: ${file.path}")
-
-
-                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    FileProvider.getUriForFile(this, "net.ienlab.caremaker.fileprovider", file)
-                } else {
-                    Uri.fromFile(file)
-                }
-
-                val share = Intent(Intent.ACTION_SEND)
-                share.type = "image/png"
-                val out = FileOutputStream(file)
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, file.path)
-                share.putExtra(Intent.EXTRA_STREAM, uri)
-
-                if (scaleTypeCode == SCALETYPE_NONE) {
-                    img_care_heart.setImageBitmap(originImage)
-                } else if (scaleTypeCode == SCALETYPE_ROUND) {
-                    originImageCircle = RoundedBitmapDrawableFactory.create(resources, originImage)
-                    originImageCircle.cornerRadius = max(originImage.width, originImage.height) / 2.0f
-                    originImageCircle.setAntiAlias(true)
-                    img_care_heart.setImageDrawable(originImageCircle)
-                }
-
-                startActivity(Intent.createChooser(share, getString(R.string.share)))
             } else {
                 Snackbar.make(it, getString(R.string.allow_permission), Snackbar.LENGTH_LONG)
                     .setAction(getString(R.string.allow)) {
@@ -251,6 +192,77 @@ class MainActivity : AppCompatActivity() {
         img_care_over.setOnClickListener { rotateImage() }
 
         img_care_under.setOnClickListener { rotateImage() }
+    }
+
+    fun savedScale(divide: Int) {
+        val bitmap = Bitmap.createBitmap(1000 / divide, 1000 / divide, Bitmap.Config.ARGB_8888)
+        val paint = Paint()
+        val canvas = Canvas(bitmap)
+        var bitmap_under =
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.img_care_under),
+                1000 / divide, 1000 / divide, true
+            )
+
+        var bitmap_over =
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.img_care_over),
+                1000 / divide, 1000 / divide, true
+            )
+
+        canvas.drawBitmap(bitmap_under, 0f, 0f, paint)
+//                if (!storage.purchasedAds())
+//                    canvas.drawBitmap(bitmap_watermark, 720f, 720f, paint)
+
+        var width = 559
+        var height = 559
+        if (originImage.width >= originImage.height) {
+            height = 559 * originImage.height / originImage.width
+        } else {
+            width = 559 * originImage.width / originImage.height
+        }
+
+        if (scaleTypeCode == SCALETYPE_NONE) {
+            val copyImage = Bitmap.createScaledBitmap(originImage, width / divide, height / divide, false)
+            canvas.drawBitmap(copyImage, (379 - width / 2).toFloat() / divide, (721 - height / 2).toFloat() / divide, paint)
+        } else if (scaleTypeCode == SCALETYPE_ROUND) {
+            val copyImageCircle = originImageCircle
+            copyImageCircle.setBounds((379 - width / 2) / divide, (721 - height / 2) / divide, (379 + width / 2) / divide, (721 + height / 2) / divide)
+            copyImageCircle.draw(canvas)
+        }
+
+        canvas.drawBitmap(bitmap_over, 0f, 0f, paint)
+
+
+        val file = File(cacheDir, TEMP_FILE_NAME)
+
+        Log.d(TAG, "path: ${file.path}")
+
+
+        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            FileProvider.getUriForFile(this, "net.ienlab.caremaker.fileprovider", file)
+        } else {
+            Uri.fromFile(file)
+        }
+
+        val share = Intent(Intent.ACTION_SEND)
+        share.type = "image/png"
+        val out = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, file.path)
+        share.putExtra(Intent.EXTRA_STREAM, uri)
+
+        if (scaleTypeCode == SCALETYPE_NONE) {
+            img_care_heart.setImageBitmap(originImage)
+        } else if (scaleTypeCode == SCALETYPE_ROUND) {
+            originImageCircle = RoundedBitmapDrawableFactory.create(resources, originImage)
+            originImageCircle.cornerRadius = max(originImage.width, originImage.height) / 2.0f
+            originImageCircle.setAntiAlias(true)
+            img_care_heart.setImageDrawable(originImageCircle)
+        }
+
+        startActivity(Intent.createChooser(share, getString(R.string.share)))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

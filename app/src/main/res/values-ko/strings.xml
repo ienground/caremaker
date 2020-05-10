@@ -19,6 +19,6 @@
     <string name="help_4_title">공유하기</string>
     <string name="help_4_content">만든 이미지를 외부로 공유합니다. 휴대폰에 저장할 수도 있습니다.</string>
     <string name="changelog">체인지로그</string>
-    <string name="changelog_content">최초 출시</string>
+    <string name="changelog_content">메모리가 적은 스마트폰 대응</string>
     <string name="ads_info">↑ 개발자가 만든 앱!</string>
 </resources>

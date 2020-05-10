@@ -19,6 +19,6 @@
     <string name="help_4_title">Share</string>
     <string name="help_4_content">Share the created image to the outside. You can also save it on your phone.</string>
     <string name="changelog">Changelog</string>
-    <string name="changelog_content">Initial Release</string>
+    <string name="changelog_content">Fixed for Leak Memory Phone</string>
     <string name="ads_info">↑ Apps developer made</string>
 </resources>
