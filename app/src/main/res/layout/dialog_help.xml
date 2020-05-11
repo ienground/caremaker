@@ -133,5 +133,37 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/help_4_title" />
 
+    <ImageView
+        android:id="@+id/help_5"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_magic_wand"
+        android:tint="@color/black"
+        android:layout_marginTop="@dimen/usual_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_4_content" />
+
+    <TextView
+        android:id="@+id/help_5_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_5_title"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/help_5" />
+
+    <TextView
+        android:id="@+id/help_5_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/help_5_content"
+        android:layout_marginStart="@dimen/usual_margin"
+        app:layout_constraintStart_toEndOf="@id/help_5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/help_5_title" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

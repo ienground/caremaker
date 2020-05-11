@@ -10,6 +10,7 @@
     <string name="ok">OK</string>
     <string name="import_image">Import Image</string>
     <string name="banner_ad_unit_id">ca-app-pub-8050897224557020/5171320760</string>
+    <string name="full_ad_unit_id">ca-app-pub-8050897224557020/2173638248</string>
     <string name="help_1_title">Care Icon</string>
     <string name="help_1_content">Click to the rotate image holding the Care icon 90 degrees clockwise.</string>
     <string name="help_2_title">Image corner rounded</string>
@@ -18,7 +19,10 @@
     <string name="help_3_content">Click to import image in your gallery.</string>
     <string name="help_4_title">Share</string>
     <string name="help_4_content">Share the created image to the outside. You can also save it on your phone.</string>
+    <string name="help_5_title">Magic Wand</string>
+    <string name="help_5_content">Remove the click point automatically. It can be used to remove background.</string>
     <string name="changelog">Changelog</string>
-    <string name="changelog_content">Fixed for Leak Memory Phone</string>
+    <string name="changelog_content">- Added save button.\n- Now able to remove background.</string>
     <string name="ads_info">↑ Apps developer made</string>
+    <string name="saved">Saved successfully.</string>
 </resources>

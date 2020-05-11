@@ -1,6 +1,7 @@
 package net.ienlab.caremaker
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -8,28 +9,30 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
-import android.text.Html
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.RoundedBitmapDrawable
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
+import com.github.gabrielbb.cutout.CutOut
+import com.google.android.gms.ads.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.*
-import java.nio.charset.Charset
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import kotlin.math.abs
 import kotlin.math.max
 
 val TAG = "CareMakerTAG"
@@ -48,6 +51,11 @@ class MainActivity : AppCompatActivity() {
     val SCALETYPE_NONE = 4
     var scaleTypeCode = SCALETYPE_NONE
 
+    lateinit var interstitialAd: InterstitialAd
+
+    var width = 0
+    var height = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -65,6 +73,7 @@ class MainActivity : AppCompatActivity() {
             MobileAds.setRequestConfiguration(requestConfiguration)
         }
 
+        setFullAd()
         adView.loadAd(adRequest.build())
 
         val thumbId = arrayOf(R.drawable.ads_bp, R.drawable.ads_ih)
@@ -163,17 +172,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_share.setOnClickListener {
+            displayAd()
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 try {
-                    savedScale(1)
+                    sharedTask().execute(1)
                 } catch (e: OutOfMemoryError) {
                     e.printStackTrace()
                     try {
-                        savedScale(2)
+                        sharedTask().execute(2)
                     } catch (e2: OutOfMemoryError) {
                         e2.printStackTrace()
-                        savedScale(4)
+                        sharedTask().execute(4)
                     }
                 }
 
@@ -187,6 +197,31 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        btn_save.setOnClickListener {
+            displayAd()
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    savingTask().execute(1)
+                } catch (e: OutOfMemoryError) {
+                    e.printStackTrace()
+                    try {
+                        savingTask().execute(2)
+                    } catch (e2: OutOfMemoryError) {
+                        e2.printStackTrace()
+                        savingTask().execute(4)
+                    }
+                }
+
+            } else {
+                Snackbar.make(it, getString(R.string.allow_permission), Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.allow)) {
+                        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+                    }
+                    .show()
+            }
+        }
+
+
         img_care_heart.setOnClickListener { rotateImage() }
 
         img_care_over.setOnClickListener { rotateImage() }
@@ -194,7 +229,7 @@ class MainActivity : AppCompatActivity() {
         img_care_under.setOnClickListener { rotateImage() }
     }
 
-    fun savedScale(divide: Int) {
+    fun sharedScale(divide: Int) {
         val bitmap = Bitmap.createBitmap(1000 / divide, 1000 / divide, Bitmap.Config.ARGB_8888)
         val paint = Paint()
         val canvas = Canvas(bitmap)
@@ -253,16 +288,99 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, file.path)
         share.putExtra(Intent.EXTRA_STREAM, uri)
 
-        if (scaleTypeCode == SCALETYPE_NONE) {
-            img_care_heart.setImageBitmap(originImage)
-        } else if (scaleTypeCode == SCALETYPE_ROUND) {
-            originImageCircle = RoundedBitmapDrawableFactory.create(resources, originImage)
-            originImageCircle.cornerRadius = max(originImage.width, originImage.height) / 2.0f
-            originImageCircle.setAntiAlias(true)
-            img_care_heart.setImageDrawable(originImageCircle)
+        runOnUiThread {
+            if (scaleTypeCode == SCALETYPE_NONE) {
+                img_care_heart.setImageBitmap(originImage)
+            } else if (scaleTypeCode == SCALETYPE_ROUND) {
+                originImageCircle = RoundedBitmapDrawableFactory.create(resources, originImage)
+                originImageCircle.cornerRadius = max(originImage.width, originImage.height) / 2.0f
+                originImageCircle.setAntiAlias(true)
+                img_care_heart.setImageDrawable(originImageCircle)
+            }
         }
 
         startActivity(Intent.createChooser(share, getString(R.string.share)))
+    }
+
+    fun savedScale(divide: Int) {
+        val bitmap = Bitmap.createBitmap(1000 / divide, 1000 / divide, Bitmap.Config.ARGB_8888)
+        val paint = Paint()
+        val canvas = Canvas(bitmap)
+        var bitmap_under =
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.img_care_under),
+                1000 / divide, 1000 / divide, true
+            )
+
+        var bitmap_over =
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.img_care_over),
+                1000 / divide, 1000 / divide, true
+            )
+
+        canvas.drawBitmap(bitmap_under, 0f, 0f, paint)
+//                if (!storage.purchasedAds())
+//                    canvas.drawBitmap(bitmap_watermark, 720f, 720f, paint)
+
+        var width = 559
+        var height = 559
+        if (originImage.width >= originImage.height) {
+            height = 559 * originImage.height / originImage.width
+        } else {
+            width = 559 * originImage.width / originImage.height
+        }
+
+        if (scaleTypeCode == SCALETYPE_NONE) {
+            val copyImage =
+                Bitmap.createScaledBitmap(originImage, width / divide, height / divide, false)
+            canvas.drawBitmap(
+                copyImage,
+                (379 - width / 2).toFloat() / divide,
+                (721 - height / 2).toFloat() / divide,
+                paint
+            )
+        } else if (scaleTypeCode == SCALETYPE_ROUND) {
+            val copyImageCircle = originImageCircle
+            copyImageCircle.setBounds(
+                (379 - width / 2) / divide,
+                (721 - height / 2) / divide,
+                (379 + width / 2) / divide,
+                (721 + height / 2) / divide
+            )
+            copyImageCircle.draw(canvas)
+        }
+
+        canvas.drawBitmap(bitmap_over, 0f, 0f, paint)
+
+        val fileDir = File(externalMediaDirs[0], "CareMaker")
+        val fileName = "CareMaker_${System.currentTimeMillis()}.png"
+        if (!fileDir.exists()) fileDir.mkdirs()
+        val file = File(fileDir, fileName)
+
+        Log.d(TAG, "path: ${file.path}")
+
+        val out = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, file.path)
+
+        runOnUiThread {
+            if (scaleTypeCode == SCALETYPE_NONE) {
+                img_care_heart.setImageBitmap(originImage)
+            } else if (scaleTypeCode == SCALETYPE_ROUND) {
+                originImageCircle = RoundedBitmapDrawableFactory.create(resources, originImage)
+                originImageCircle.cornerRadius = max(originImage.width, originImage.height) / 2.0f
+                originImageCircle.setAntiAlias(true)
+                img_care_heart.setImageDrawable(originImageCircle)
+            }
+        }
+
+        val mediaScanner = MediaScanner.newInstance(applicationContext)
+        try {
+            mediaScanner.mediaScanning(file.toString())
+        } catch(e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -315,18 +433,28 @@ class MainActivity : AppCompatActivity() {
                     val imageStream = contentResolver.openInputStream(data!!.data as Uri)
                     val selectedImage = BitmapFactory.decodeStream(imageStream)
 
-                    originImage = selectedImage.copy(Bitmap.Config.ARGB_8888, true)
-                    originImageCircle = RoundedBitmapDrawableFactory.create(resources, originImage)
-                    originImageCircle.cornerRadius = max(originImage.width, originImage.height) / 2.0f
-                    originImageCircle.setAntiAlias(true)
+                    width = selectedImage.width
+                    height = selectedImage.height
 
-//                    img_care_heart.setImageBitmap(originImage)
+                    CutOut.activity().src(data.data as Uri).noCrop()
+                        .start(this)
 
-                    if (scaleTypeCode == SCALETYPE_ROUND) {
-                        img_care_heart.setImageDrawable(originImageCircle)
-                    } else if (scaleTypeCode == SCALETYPE_NONE) {
-                        img_care_heart.setImageBitmap(originImage)
-                    }
+
+//
+//                    originImage = selectedImage.copy(Bitmap.Config.ARGB_8888, true)
+//                    originImageCircle = RoundedBitmapDrawableFactory.create(resources, originImage)
+//                    originImageCircle.cornerRadius = max(originImage.width, originImage.height) / 2.0f
+//                    originImageCircle.setAntiAlias(true)
+//
+//                    Log.d(TAG, "origin width : ${originImage.width}, origin height : ${originImage.height}")
+//
+////                    img_care_heart.setImageBitmap(originImage)
+//
+//                    if (scaleTypeCode == SCALETYPE_ROUND) {
+//                        img_care_heart.setImageDrawable(originImageCircle)
+//                    } else if (scaleTypeCode == SCALETYPE_NONE) {
+//                        img_care_heart.setImageBitmap(originImage)
+//                    }
 
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
@@ -343,6 +471,54 @@ class MainActivity : AppCompatActivity() {
 //                    watermark.visibility = View.GONE
 //                    adView.visibility = View.GONE
 //                }
+            }
+            CutOut.CUTOUT_ACTIVITY_REQUEST_CODE.toInt() -> {
+                try {
+                    when (resultCode) {
+                        Activity.RESULT_OK -> {
+                            val imageUri = CutOut.getUri(data)
+                            val imageStream = contentResolver.openInputStream(imageUri)
+                            val selectedImage = BitmapFactory.decodeStream(imageStream)
+
+                            var big_width = 1200
+                            var big_height = 1200
+
+                            if (big_width * height / width < 1200) {
+                                big_width = big_height * width / height
+                            } else if (big_height * width / height < 1200) {
+                                big_height = big_width * height / width
+                            }
+
+
+                            originImage = Bitmap.createBitmap(selectedImage, 0, (selectedImage.height - (selectedImage.width * big_height / big_width)) / 2, selectedImage.width, selectedImage.width * big_height / big_width)
+
+
+//                            originImage = selectedImage.copy(Bitmap.Config.ARGB_8888, true)
+                            originImageCircle =
+                                RoundedBitmapDrawableFactory.create(resources, originImage)
+                            originImageCircle.cornerRadius =
+                                max(originImage.width, originImage.height) / 2.0f
+                            originImageCircle.setAntiAlias(true)
+
+                            Log.d(TAG, "origin width : ${width}, origin height : ${height}")
+                            Log.d(TAG, "big width : ${big_width}, big height : ${big_height}")
+                            Log.d(TAG, "edit width : ${originImage.width}, edit height : ${originImage.height}")
+
+//                    img_care_heart.setImageBitmap(originImage)
+
+                            if (scaleTypeCode == SCALETYPE_ROUND) {
+                                img_care_heart.setImageDrawable(originImageCircle)
+                            } else if (scaleTypeCode == SCALETYPE_NONE) {
+                                img_care_heart.setImageBitmap(originImage)
+                            }
+                        }
+                        CutOut.CUTOUT_ACTIVITY_RESULT_ERROR_CODE.toInt() -> {
+
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -383,5 +559,87 @@ class MainActivity : AppCompatActivity() {
         } else if (scaleTypeCode == SCALETYPE_ROUND) {
             img_care_heart.setImageDrawable(originImageCircle)
         }
+    }
+
+    fun setFullAd() {
+        interstitialAd = InterstitialAd(this)
+        interstitialAd.adUnitId = getString(R.string.full_ad_unit_id)
+        val adRequest2 = AdRequest.Builder()
+        if (BuildConfig.DEBUG) {
+            val testDevices: MutableList<String> = mutableListOf()
+            testDevices.add("F06E8B7D6604D51927A36B77876AF8DC")
+
+            val requestConfiguration = RequestConfiguration.Builder()
+                .setTestDeviceIds(testDevices)
+                .build()
+            MobileAds.setRequestConfiguration(requestConfiguration)
+        }
+
+        interstitialAd.loadAd(adRequest2.build())
+        interstitialAd.adListener = object : AdListener() { //전면 광고의 상태를 확인하는 리스너 등록
+            override fun onAdClosed() { //전면 광고가 열린 뒤에 닫혔을 때
+                val adRequest3 = AdRequest.Builder()
+                if (BuildConfig.DEBUG) {
+                    val testDevices: MutableList<String> = mutableListOf()
+                    testDevices.add("F06E8B7D6604D51927A36B77876AF8DC")
+
+                    val requestConfiguration = RequestConfiguration.Builder()
+                        .setTestDeviceIds(testDevices)
+                        .build()
+                    MobileAds.setRequestConfiguration(requestConfiguration)
+                }
+                interstitialAd.loadAd(adRequest3.build())
+            }
+        }
+    }
+
+    fun displayAd() {
+        val sharedPreferences = getSharedPreferences(packageName + "_preferences", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putInt("adCharge",
+            sharedPreferences.getInt("adCharge", 0) + 1).apply()
+        Log.d("AdTAG", "ad:" + sharedPreferences.getInt("adCharge", 0))
+        Log.d("AdTAG", "isLoaded:" + interstitialAd.isLoaded)
+
+        if (interstitialAd.isLoaded && sharedPreferences.getInt("adCharge", 0) >= 3) {
+            interstitialAd.show()
+            sharedPreferences.edit().putInt("adCharge", 0).apply()
+        }
+    }
+
+    inner class savingTask: AsyncTask<Int, Int, Boolean>() {
+        override fun onPreExecute() {
+            save_loading.visibility = View.VISIBLE
+            super.onPreExecute()
+        }
+
+        override fun doInBackground(vararg params: Int?): Boolean {
+            savedScale(params[0]!!)
+            return true
+        }
+
+        override fun onPostExecute(result: Boolean?) {
+            save_loading.visibility = View.GONE
+            Snackbar.make(window.decorView.rootView, getString(R.string.saved), Snackbar.LENGTH_SHORT).show()
+            super.onPostExecute(result)
+        }
+
+    }
+
+    inner class sharedTask: AsyncTask<Int, Int, Boolean>() {
+        override fun onPreExecute() {
+            save_loading.visibility = View.VISIBLE
+            super.onPreExecute()
+        }
+
+        override fun doInBackground(vararg params: Int?): Boolean {
+            sharedScale(params[0]!!)
+            return true
+        }
+
+        override fun onPostExecute(result: Boolean?) {
+            save_loading.visibility = View.GONE
+            super.onPostExecute(result)
+        }
+
     }
 }
